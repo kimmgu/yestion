@@ -1,11 +1,19 @@
-<script setup>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-</script>
-
 <template>
-  <RouterView />
+  <div>
+    <LNB />
+    <RouterView />
+  </div>
 </template>
+
+<script>
+import LNB from '~/components/LNB.vue'
+
+export default {
+  components: {
+    LNB
+  }
+}
+</script>
 
 <style>
 #app {
