@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
+import router from '~/routes'
 
 export const useWorkspaceStore = defineStore('workspace', {
   state() {
     return {
       workspace: {},
-      workspaces: []
+      workspaces: [],
+      currentWorkspacePath: []
     }
   },
   getters: {
@@ -12,70 +14,47 @@ export const useWorkspaceStore = defineStore('workspace', {
   },
   actions: {
     // C
-    async createWorkspace() {
+    async createWorkspace(payload = {}) {
+      const { parentId } = payload
       // fetch('url', options)
-      const res = await fetch('https://asia-northeast3-heropy-api.cloudfunctions.net/api/notion/workspaces', {
+      await request({
         method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'apikey': 'FcKdtJs202204',
-          'username': 'KimMingu'
-        },
-        body: JSON.stringify({
-          // parentId: '',
-          title: 'yestion',
-          content: 'notion clone coding',
-          // poster: ''
-        })
+        body: {
+          parentId,
+          title: ''
+        }
       })
-      const workspace = await res.json()
-      console.log(workspace)
       this.readWorkspaces()
     },
     // R
     async readWorkspaces() {
-      const res = await fetch('https://asia-northeast3-heropy-api.cloudfunctions.net/api/notion/workspaces', {
-        method: 'GET',
-        headers: {
-          'content-type': 'application/json',
-          'apikey': 'FcKdtJs202204',
-          'username': 'KimMingu'
-        },
+      const worksapces = await request({
+        method: 'GET'
       })
-      const worksapces = await res.json()
-      console.log(worksapces)
-
       this.workspaces = worksapces
     },
     async readWorkspace(id) {
-      const res = await fetch(`https://asia-northeast3-heropy-api.cloudfunctions.net/api/notion/workspaces/${id}`, {
+      const workspace = await request({
         method: 'GET',
-        headers: {
-          'content-type': 'application/json',
-          'apikey': 'FcKdtJs202204',
-          'username': 'KimMingu'
-        },
+        id
       })
-      const workspace = await res.json()
       console.log(workspace)
 
       this.workspace = workspace
     },
     // U
     async updateWorkspace(payload) {
-      const { id, title, content } = payload
-      await fetch(`https://asia-northeast3-heropy-api.cloudfunctions.net/api/notion/workspaces/${id}`, {
+      const { id, title, content, poster } = payload
+      const updatedWorkspace = await request({
+        id,
         method: 'PUT',
-        headers: {
-          'content-type': 'application/json',
-          'apikey': 'FcKdtJs202204',
-          'username': 'KimMingu'
-        },
-        body: JSON.stringify({
+        body: {
           title,
-          content
-        })
+          content,
+          poster
+        }
       })
+      this.workspace = updatedWorkspace
 
       this.readWorkspaces()
     },
@@ -90,6 +69,38 @@ export const useWorkspaceStore = defineStore('workspace', {
         },
       })
       this.readWorkspaces()
+    },
+    findWorkspacePath() {
+      const currentWorkspaceId = router.currentRoute.value.params.id
+      const find = (workspace, parents) => {
+        if(currentWorkspaceId === workspace.id) {
+          this.currentWorkspacePath = [...parents, workspace]
+        }
+        if(workspace.children) {
+          workspace.children.forEach(ws => {
+            find(ws, [...parents, workspace])
+          })
+        }
+      }
+      this.workspaces.forEach(workspace => {
+        find(workspace, [])
+      })
     }
   }
 })
+
+async function request(options) {
+  const { id = '', method, body } = options
+  const res = await fetch(`https://asia-northeast3-heropy-api.cloudfunctions.net/api/notion/workspaces/${id}`, {
+    method,
+    headers: {
+      'content-type': 'application/json',
+      'apikey': 'FcKdtJs202204',
+      'username': 'KimMingu'
+    },
+    body: JSON.stringify(body)
+  })
+  // await res.json() => 123
+  // res.json() => promise instance 
+  return res.json()
+}
