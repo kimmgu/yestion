@@ -2,7 +2,7 @@
   <div>
     <li>
       <RouterLink :to="`/workspaces/${workspace.id}`">
-        {{ workspace.title || '제목 없음' }}
+        {{ workspace.title || 'Untitled' }}
       </RouterLink>
       <button @click="workspaceStore.createWorkspace({ parentId: workspace.id })">
         +

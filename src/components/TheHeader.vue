@@ -1,6 +1,16 @@
 <template>
   <div>
     <header>
+      Header !!
+      <ul>
+        <li
+          v-for="path in workspaceStore.currentWorkspacePath"
+          :key="path.id">
+          <RouterLink :to="`/workspaces/${path.id}`">
+            {{ path.title || 'Untitled' }}
+          </RouterLink>
+        </li>
+      </ul>
     </header>
   </div>
 </template>
@@ -11,11 +21,18 @@ import { useWorkspaceStore } from '~/store/workspace'
 
 export default {
     computed: {
-        ...mapStores(useWorkspaceStore)
+      ...mapStores(useWorkspaceStore),
+      workspacesLoaded() {
+        return this.workspaceStore.workspacesLoaded
+      }
     },
-    mounted() {
-        this.workspaceStore.findWorkspacePath()
-        console.log('currentWorkspacePath', this.workspaceStore.currentWorkspacePath)
+    watch: {
+      workspacesLoaded(value) {
+        value && this.workspaceStore.findWorkspacePath(this.$route.params.id)
+      },
+      $route() {
+        this.workspaceStore.findWorkspacePath(this.$route.params.id)
+      }
     }
 }
 </script>

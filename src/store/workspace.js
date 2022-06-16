@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
-import router from '~/routes'
+// import router from '~/routes'
 
 export const useWorkspaceStore = defineStore('workspace', {
   state() {
     return {
       workspace: {},
       workspaces: [],
+      workspacesLoaded: false,
       currentWorkspacePath: []
     }
   },
@@ -17,7 +18,7 @@ export const useWorkspaceStore = defineStore('workspace', {
     async createWorkspace(payload = {}) {
       const { parentId } = payload
       // fetch('url', options)
-      await request({
+      const workspace = await request({
         method: 'POST',
         body: {
           parentId,
@@ -25,6 +26,8 @@ export const useWorkspaceStore = defineStore('workspace', {
         }
       })
       this.readWorkspaces()
+      // router.push(`/workspaces/${workspace.id}`)
+      window.location.href = `/workspaces/${workspace.id}`
     },
     // R
     async readWorkspaces() {
@@ -32,14 +35,17 @@ export const useWorkspaceStore = defineStore('workspace', {
         method: 'GET'
       })
       this.workspaces = worksapces
+      this.workspacesLoaded = true
+
+      if(!this.workspaces.length) {
+        this.createWorkspace()
+      }
     },
     async readWorkspace(id) {
       const workspace = await request({
         method: 'GET',
         id
       })
-      console.log(workspace)
-
       this.workspace = workspace
     },
     // U
@@ -60,18 +66,13 @@ export const useWorkspaceStore = defineStore('workspace', {
     },
     // D
     async deleteWorkspace(id) {
-      await fetch(`https://asia-northeast3-heropy-api.cloudfunctions.net/api/notion/workspaces/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'content-type': 'application/json',
-          'apikey': 'FcKdtJs202204',
-          'username': 'KimMingu'
-        },
+      await request({
+        id,
+        method: 'DELETE'
       })
       this.readWorkspaces()
     },
-    findWorkspacePath() {
-      const currentWorkspaceId = router.currentRoute.value.params.id
+    findWorkspacePath(currentWorkspaceId) {
       const find = (workspace, parents) => {
         if(currentWorkspaceId === workspace.id) {
           this.currentWorkspacePath = [...parents, workspace]

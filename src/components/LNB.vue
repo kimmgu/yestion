@@ -1,12 +1,17 @@
 <template>
-  <div>
-    <ul>
+  <nav>
+    <div class="header">
+      Mingu's Notion
+    </div>
+    <ul class="workspaces">
       <WorkspaceItem
         v-for="workspace in workspaceStore.workspaces"
         :key="workspace.id"
         :workspace="workspace" />
     </ul>
-  </div>
+    <div class="actions">
+    </div>
+  </nav>
 </template>
 
 <script>
@@ -26,3 +31,33 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="scss">
+@import "~/scss/variables";
+
+nav {
+  flex-shrink: 0;
+  min-width: 160px;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  background-color: $color-background;
+  .header {
+    flex-shrink: 0;
+    height: 48px;
+    padding: 14px;
+  }
+
+  .workspaces {
+    flex-grow: 1;
+    overflow: auto;
+  }
+
+  .actions {
+    flex-shrink: 0;
+    height: 48px;
+    padding: 14px;
+    border-top: 1px solid red;
+  }
+}
+</style>

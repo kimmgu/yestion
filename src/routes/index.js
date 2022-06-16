@@ -12,7 +12,7 @@ export default createRouter({
       component: Home
     },
     {
-      path: '/workspaces/:id',
+      path: '/Workspaces/:id',
       component: Workspace
     }
   ]

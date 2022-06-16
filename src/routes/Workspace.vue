@@ -16,12 +16,12 @@
           type="file"
           @change="selectPoster" />
         <button @click="deletePoster">
-          이미지 삭제
+          Remove
         </button>
       </div>
       <h1
         ref="title"
-        placeholder="제목 없음"
+        placeholder="Untitled"
         contenteditable
         @keydown.prevent.enter="$refs.content.focus()"
         @blur="onInput">
@@ -29,7 +29,7 @@
       </h1>
       <p
         ref="content"
-        placeholder="내용을 입력하세요!"
+        placeholder="Press Enter to continue with empty page"
         contenteditable
         @blur="onInput"
         v-html="workspaceStore.workspace.content">
